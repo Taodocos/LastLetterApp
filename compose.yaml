@@ -1,0 +1,13 @@
+# version: "3.8"
+services:
+  server:
+    build:
+      context: .
+    image: aba_budget_image
+    container_name: aba_budget
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env # Load variables from the .env file
+    ports:
+      - "1234:1234"
