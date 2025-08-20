@@ -1,6 +1,7 @@
 'use client';
 import React, {} from 'react';
 import { AmharicLetter4Data } from '../amhLetterForm/melkamSra';
+import { toWords } from 'number-to-words';
 
 interface AmharicLetter4PreviewProps {
   data: AmharicLetter4Data;
@@ -8,34 +9,32 @@ interface AmharicLetter4PreviewProps {
 }
 
 const AmharicLetter4Preview: React.FC<AmharicLetter4PreviewProps> = ({ data, qrCodeUrl }) => {
-  console.log('QR Code URL in Preview:', qrCodeUrl);
-
-
-
   const formatDate = (dateString: string) => {
-    if (!dateString) return '_______________';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric', month: 'long', day: 'numeric'
-    });
-  };
-
+        if (!dateString) return '_______________';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric',
+        });
+      };
+        const formatNumber = (num: number) => {
+        return new Intl.NumberFormat('en-US').format(num);
+      };
+    
+       const capitalizeWords = (str: string) => {
+        return str.replace(/\b\w/g, (char) => char.toUpperCase());
+      };
+    const bondAmountInWords = data.bondAmount ? toWords(data.bondAmount) : '_______________';
+    
   return (
      <div
-      id="letter-content"
+     id="letter-content"
       className="bg-white p-8 shadow-lg min-h-[800px] max-w-4xl mx-auto"
-      style={{ fontFamily: "Times, serif", lineHeight: "1.6" }}
+      style={{ fontFamily: 'Times, serif' }}
     >
-      {/* Header */}
-      <div className="text-center mb-8">
-       <div className="w-16 h-16 bg-blue-600 mx-auto mb-4 flex items-center justify-center">
-          <img src="/images/Picture1.png" alt="Logo" className="w-12 h-12" />
-        </div>
-        <h1 className="text-xl font-bold mb-4">አማራ ባንክ አ.ማ</h1>
-      </div>
+      
+    
 
-
-
+   
          {qrCodeUrl ? (
         <div className="flex justify-end mb-4">
           <img
@@ -46,7 +45,7 @@ const AmharicLetter4Preview: React.FC<AmharicLetter4PreviewProps> = ({ data, qrC
           />
         </div>
       ) : (
-        <p className="text-red-500">QR Code not generated yet.</p>
+        <p className="text-red-500"></p>
       )}
 
 
@@ -64,9 +63,7 @@ const AmharicLetter4Preview: React.FC<AmharicLetter4PreviewProps> = ({ data, qrC
       <div className="mb-8">
         <p>
           ለ{" "}
-          {data.toName ||
-            "_______________________________________________"}
-        </p>
+          {capitalizeWords( data.toName || '_______________________________________________')}</p>
         <div className="ml-4">
           <p>
             አድራሻ{" "}
@@ -84,25 +81,25 @@ const AmharicLetter4Preview: React.FC<AmharicLetter4PreviewProps> = ({ data, qrC
       <div className="space-y-4 text-justify leading-relaxed">
         <p>
           አቶ/ወሮ{" "}
-          {data.clientName  ||
-            "_______________________________________________"}{" "}
-          የተባሉ የዋስትና ደንበኛችን በሰጡን የትዕዛዝ ፈቃድ መሰረት ይህን የብር {" "} {data.currency || 'Birr'} {data.bondAmount || '___________'}
-          ({data.bondAmount || '_______________'}) የመልካም ስራ አፈፃፀም ዋስትና  እስከ 
-          {data.validityDate || '___________'} ቀን/ {data.validityMonth || '___________'} ወር/ {data.validityYear || '___________'} አመት.
-          ድረስ የሚቆይ መስጠታችንን በአክብሮት እናሳውቃለን፡፡ 
+               <span className="font-bold"> { capitalizeWords( data.clientName || '_______________________________________________')} </span>
+
+          የተባሉ የዋስትና ደንበኛችን በሰጡን የትዕዛዝ ፈቃድ መሰረት ይህን የብር  <span className="font-bold"> {data.currency} {data.bondAmount ? formatNumber(data.bondAmount) : "_______________"}
+          ({bondAmountInWords}) </span>  የመልካም ስራ አፈፃፀም ዋስትና  እስከ 
+<span className="font-bold"> {formatDate(data.validityDate || '___________')}  </span>
+                ድረስ የሚቆይ መስጠታችንን በአክብሮት እናሳውቃለን፡፡ 
 
         </p>
 
 
         <p>
-          የዚህ የመልካም ስራ አፈፃፀም ዋስትና  አላማ ደንበኛችን በቁጥር  {data.bidNo || '_______________'} በቀን {formatDate(data.bidDate)}{" "}
+          የዚህ የመልካም ስራ አፈፃፀም ዋስትና  አላማ ደንበኛችን በቁጥር  <span className="font-bold"> {data.bidNo || '_______________'}  በቀን {formatDate(data.bidDate)} </span>
           ዓ.ም ባወጣችሁት የጨረታ ማስታወቂያ መሰረት በጨረታው እንዲሳተፉ ለማድረግ ነው፡፡
         </p>
 
         <p>
          በዚህ የመልካም ስራ አፈፃፀም ዋስትና መሰረት ደንበኛችን የገቡትን የውል ግዴታ በውላችሁ መሰረት ባይፈፅሙ  ያለምንም 
          ቅድመ ሁኔታ ደንበኛችን ግዴታቸውን አለመወጣታቸውን በፅሁፍ በመግለፅ በምታቀርቡልን የክፍያ ጥያቄ መሰረት እስከ 
-         {data.currency || 'Birr'} {data.bondAmount || '_______________'} ({data.bondAmount || '_______________'}){" "}
+         <span className="font-bold"> {data.currency }{data.bondAmount ? formatNumber(data.bondAmount) : "_______________"} ({bondAmountInWords}) </span>
           ያህል የሆነና ከዚህ መጠን ያልበለጠ ገንዘብ ወዲያውኑ ለመክፈል ተስማምተናል፡፡
         </p>
 
@@ -116,14 +113,20 @@ const AmharicLetter4Preview: React.FC<AmharicLetter4PreviewProps> = ({ data, qrC
 
       </div>
 
-      {/* Footer */}
-      <div className="mt-16">
-        <p className="font-bold">አማራ ባንክ</p>
-        <p className="mt-4">ስም {data.authorizedSignatory || "_______________"}</p>
-        <p className="mt-2">
-          የሃላፊ ፊርማዎች { "_______________"}
-        </p>
-      </div>
+    <div className="flex mt-16 font-bold">
+    <div className="mr-8">                                                              
+        <p className="mt-4">{data.authorizedSignatoryPosition || '_____________'} . {capitalizeWords(data.authorizedSignatory || '_______________')}</p>
+         
+        <p className="mt-2">{"_______________"}</p>
+    </div>
+
+    <div className="ml-8">                                                               
+         <p className="mt-4">{data.authorizedSignatoryPosition1 || '_____________'} . {capitalizeWords(data.authorizedSignatory1 || '_______________')}</p>
+       
+        <p className="mt-2">{"_______________"}</p>
+    </div>
+
+    </div>
     </div>
   );
 };

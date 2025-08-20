@@ -54,37 +54,8 @@ const AdvancePGForm: React.FC<AdvancePGFormProps> = ({ data, onUpdate }) => {
     }
   };
 
-   const validatenumber = (field: keyof AdvancePGData, value: string | number) => {
-    const strValue = String(value); // Convert to string for validation
-    if (strValue.trim() ==='' ) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: `${field} is required and must be at least 1 characters long.`,
-      }));
-    } else {
-      setErrors((prev) => {
-        const { [field]: _, ...rest } = prev; // Remove error for valid field
-        return rest;
-      });
-    }
-  };
- 
-  // const validateAllFields = () => {
-  //   const newErrors: { [key in keyof AdvancePGData]?: string } = {};
-    
-  //   for (const key in data) {
-  //     const value = data[key as keyof AdvancePGData];
-  //     const strValue = String(value); // Convert to string for validation
-
-  //     if (strValue.trim() === '' || strValue.length < 3) {
-  //       newErrors[key as keyof AdvancePGData] = `${key} is required and must be at least 3 characters long.`;
-  //     }
-  //   }
-
-  //   setErrors(newErrors);
-  //   return Object.keys(newErrors).length === 0; // Returns true if no errors
-  // };
-
+   
+  
 const calculateValidityDate = (fromDate: string, days: number) => {
   if (!fromDate) {
     return ''; // Handle empty fromDate
@@ -284,16 +255,7 @@ const calculateValidityDate = (fromDate: string, days: number) => {
           </div>
         </div>
 
-    {/* <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">Bank Name</label>
-        <input
-          type="text"
-          placeholder="Enter bank name"
-          value={data.bankName}
-          onChange={(e) => handleChange('bankName', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-      </div> */}
+  
 
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700">Authorized Signatory 1</label>

@@ -3,22 +3,25 @@
 import { Shield } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 
 const Navbar: React.FC = () => {
+  // State to manage login status
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Change this as needed
+
+  const handleLoginLogout = () => {
+    // Toggle login state
+    setIsLoggedIn(prev => !prev);
+  };
+
   return (
     <>
       {/* Header Section */}
-      <header
-        style={{ backgroundColor: "#025AA2" }}
-        className="text-white shadow-lg"
-      >
+      <header style={{ backgroundColor: "#025AA2" }} className="text-white shadow-lg">
         <div className="container mx-auto py-2">
           <div className="flex items-center justify-between">
             {/* Left Section */}
             <div className="flex ml-0 items-center space-x-3">
-              {/* If you want the lucide icon instead of logo, uncomment below */}
-              {/* <Shield className="h-8 w-8" color="#ffd600" /> */}
               <Image
                 src="/images/amh.png"
                 alt="Amhara Bank Logo"
@@ -34,17 +37,15 @@ const Navbar: React.FC = () => {
 
             {/* Right Section - Navigation */}
             <nav className="hidden md:flex space-x-6">
-              <Link
-                href="/"
-                className="hover:text-yellow-300 transition-colors"
-              >
+              <Link href="/" className="hover:text-yellow-300 transition-colors">
                 Home
               </Link>
               <Link
                 href="/Login"
                 className="hover:text-yellow-300 transition-colors"
+                onClick={handleLoginLogout}
               >
-                Login
+                {isLoggedIn ? "Logout" : "Login"}
               </Link>
             </nav>
           </div>

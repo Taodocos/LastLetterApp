@@ -13,6 +13,7 @@ import BidbondPreview from './letterPreview/bidbond';
 import apiServices from '../ExportApi';
 import { generateQRCode } from './utils/generateQRCode';
 import { handleExportPDF } from './utils/ExportPDF';
+import withAuth from '../auth';
 
 interface PendingLetter {
     _id: string;
@@ -411,90 +412,83 @@ const handleApproveLetter = async (refNo: string) => {
                         </div>
                     </div>
                 )}
-             
-                {activeTab === 'grid' && (
-                 <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-  <h2 className="text-xl font-semibold text-gray-900 mb-4">Saved Letters</h2>
-  <div className="overflow-x-auto">
-    <table className="min-w-full divide-y divide-gray-200">
-      <thead className="bg-gray-50">
-        <tr>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Ref No</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Letter Type</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">From Company</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">To Company Name</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Client Name</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Authorized Signatory</th>
-          {/* <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Authorized position</th> */}
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Authorized2 Signatory</th>
-          {/* <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Authorized2 position</th> */}
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Guarantee Amount</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Created By</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Authorized By</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Date Issued</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-gray-100">
-        {gridData.map((item) => (
-          <tr
-            key={item._id}
-            className="hover:bg-gray-100 transition-all duration-200"
-          >
-            <td className="px-4 py-3 text-sm text-gray-900">{item.refNo}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.letterType}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.fromCompany}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.toCompanyName}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.clientName}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.authorizedSignatory1}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.authorizedSignatory1Position}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.authorizedSignatory2}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.authorizedSignatory2Position}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.guaranteeAmount}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.crtBy}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">
-                {getStatusName(item.status)} {/* Use the mapping function */}
-              </td>
-            <td className="px-4 py-3 text-sm text-gray-900">
-              {new Date(item.dateIssued).toLocaleDateString()}
-            </td>
-            <td className="px-4 py-3 text-sm">
+
+
+        {activeTab === 'grid' && (
+  <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
+    <h2 className="text-xl font-semibold text-gray-900 mb-4">Saved Letters</h2>
+
+    {/* Search Input */}
+    <div className="mb-4">
+      <input
+        type="text"
+        placeholder="Search by Ref No..."
+        className="border border-gray-300 rounded px-4 py-2 w-full"
+      />
+    </div>
+
+    {/* Table Structure */}
+    <div className="overflow-x-auto">
+      <div className="grid grid-cols-7 gap-2 bg-gray-50 font-semibold p-2 rounded-lg">
+        <span>Ref No</span>
+        <span>Letter Type</span>
+        <span>To Company</span>
+        <span>Client</span>
+        <span>Amount</span>
+        <span>Status</span>
+        <span>Actions</span>
+      </div>
+
+      {/* Data Rows */}
+      {gridData.map((item) => (
+        <div key={item._id} className="grid grid-cols-7 gap-2 p-2 border-b hover:bg-gray-100 transition-all duration-200">
+          <span className="text-sm text-gray-900">{item.refNo}</span>
+          <span className="text-sm text-gray-900">{item.letterType}</span>
+          <span className="text-sm text-gray-900">{item.toCompanyName}</span>
+          <span className="text-sm text-gray-900">{item.clientName}</span>
+          <span className="text-sm text-gray-900">{item.guaranteeAmount}</span>
+          <span className={`text-sm font-semibold ${item.status === 2 ? 'text-green-600' : 'text-yellow-600'}`}>
+            {getStatusName(item.status)}
+          </span>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => handlePreviewLetter(item)}
+              className="bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-600 transition"
+            >
+              Preview
+            </button>
+            {authority === '1' && item.status !== 2 && (
               <button
-                onClick={() => handlePreviewLetter(item)}
-                className="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 transition"
+                onClick={() => handleApproveLetter(item.refNo)}
+                className="bg-green-500 text-white py-1 px-2 rounded hover:bg-green-600 transition"
               >
-                 Letter Draft
+                Approve
               </button>
-            </td>
-            <td className="px-4 py-3 text-sm">
-              {authority === '2' && (
+            )}
+            {authority === '2' && (
               <button
                 onClick={() => handleGenerateLetter(item)}
-                className="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 transition"
+                className="bg-green-500 text-white py-1 px-2 rounded hover:bg-green-600 transition"
               >
                 Generate Letter
               </button>
-              )}
-            </td>
-             <td className="px-4 py-3 text-sm">
-                {authority === '1' && item.status !== 2 && ( // Check authority and status before rendering button
-                  <button
-                    onClick={() => handleApproveLetter(item.refNo)}
-                    className="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 transition"
-                  >
-                    Approve Letter
-                  </button>
-                )}
-              </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
 
-                )}
+    {/* Pagination (optional) */}
+    <div className="flex justify-between mt-4">
+      <button className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition">
+        Previous
+      </button>
+      <button className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition">
+        Next
+      </button>
+    </div>
+  </div>
+)}
             </div>
 
 {isModalOpen && (
@@ -527,4 +521,4 @@ const handleApproveLetter = async (refNo: string) => {
     );
 }
 
-export default App;
+export default withAuth(App) ;

@@ -22,7 +22,7 @@ const Navbar: React.FC = () => {
             <span>EN</span>
           </a>
           <a
-            href="/amharic"
+            href="/components/amharic"
             className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
           >
             <FileText className="h-4 w-4" />

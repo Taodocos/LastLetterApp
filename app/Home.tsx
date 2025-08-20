@@ -5,8 +5,7 @@ import Navbar from "./Navbar";
 
 const Home: React.FC = () => {
   return (
-    <>
-      <Navbar />
+  
 
       <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
@@ -84,7 +83,7 @@ const Home: React.FC = () => {
           </Link>
         </div>
       </section>
-    </>
+   
   );
 };
 
