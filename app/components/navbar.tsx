@@ -28,17 +28,26 @@ const Navbar: React.FC = () => {
             <FileText className="h-4 w-4" />
             <span>AM</span>
           </a>
-           <a
-            href="/Access"
+          <a
+            href="/components/Access"
             className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
           >
             <Settings className="h-4 w-4" />
             <span>Settings</span>
           </a>
-          {/* <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <a
+            href="/components/Report" // Link to the Report page
+            className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <FileText className="h-4 w-4" />
+            <span>Report</span>
+          </a>
+          {/* Uncomment if needed for exporting functionality
+          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <Download className="h-4 w-4" />
             <span>Export PDF</span>
-          </button> */}
+          </button>
+          */}
         </div>
       </div>
     </nav>

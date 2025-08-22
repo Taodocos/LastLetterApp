@@ -1,129 +1,78 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import { Briefcase, ChevronDown } from 'lucide-react';
-import AmharicLetterForm, { AmharicLetterData } from './amhLetterForm/chereta';
-import AmharicLetter2Form, { AmharicLetter2Data } from './amhLetterForm/kdmiya';
-import AmharicLetterPreview from './amhLetterPreview/cheretaPreview';
-import AmharicLetter4Preview from './amhLetterPreview/melkamSraPreview';
-import AmharicLetter3Preview from './amhLetterPreview/ekaAkrbotPreview';
-import AmharicLetter2Preview from './amhLetterPreview/kdmiyaPreview';
-import AmharicLetter4Form, { AmharicLetter4Data } from './amhLetterForm/melkamSra';
-import AmharicLetter3Form, { AmharicLetter3Data } from './amhLetterForm/ekaAkrbot';
-import Navbar from './navbar';
-import apiServices from '../ExportApi';
-// import { generateQRCode } from './utils/generateQRCode';
-import { handleExportPDF } from './utils/ExportPDF';
-import withAuth from '../auth';
-import { generateQRCode } from './utils/generateQRCode';
-// import withAuth from '../auth';
-
-interface PendingLetter {
-    _id: string;
-    refNo: string;
-    letterType: string;
-    fromCompany: string;
-    toCompanyName: string;
-    clientName: string;
-    currency: string;
-    authorizedSignatory2: string;
-    authorizedSignatory2Position: string;
-    authorizedSignatory1: string;
-    authorizedSignatory1Position: string;
-    guaranteeAmount: number;
-    crtBy: string;
-    status: number;
-    dateIssued: string;
-    bidExpiredMonth: string;
-    bidExpiredDay: string;
-    bidExpiredYear: string;
-    bidAmount: number;
-    bidDate: string;
-    bidNumber: string;
-    FormData:string;
-    numberOfDays: number;
-    address: string;
-}
-
-export interface LetterData {
-    refNo: string;
-    date: string;
-    toName: string;
-    address: string;
-    clientName: string;
-    bondAmount: number;
-    currency: string;
-    validityMonth: string;
-    validityDate: string;
-    validityYear: string;
-    fromDate: string; // New property to hold the from date
-    numberOfDays: number;
-    bidNo: string;
-    bidDate: string;
-    bankName: string;
-    authorizedSignatory: string;
-    authorizedSignatoryPosition: string;
-    authorizedSignatory1: string;
-    authorizedSignatoryPosition1: string;
-    qrCodeUrl?: string;
-}
-
+"use client";
+import React, { useEffect, useState } from "react";
+import { Briefcase } from "lucide-react";
+import AmharicLetterForm, { AmharicLetterData } from "./amhLetterForm/chereta";
+import AmharicLetter2Form, { AmharicLetter2Data } from "./amhLetterForm/kdmiya";
+import AmharicLetterPreview from "./amhLetterPreview/cheretaPreview";
+import AmharicLetter2Preview from "./amhLetterPreview/kdmiyaPreview";
+import AmharicLetter3Preview from "./amhLetterPreview/ekaAkrbotPreview";
+import AmharicLetter3Form, { AmharicLetter3Data } from "./amhLetterForm/ekaAkrbot";
+import AmharicLetter4Form, { AmharicLetter4Data } from "./amhLetterForm/melkamSra";
+import AmharicLetter4Preview from "./amhLetterPreview/melkamSraPreview";
+import Navbar from "./navbar";
+import apiServices from "../ExportApi";
+import { handleExportPDF } from "./utils/ExportPDF";
+import withAuth from "../auth";
+import { generateQRCode } from "./utils/generateQRCode";
+import { PendingLetter } from "@/types/letters";
+import LettersGrid from "./utils/LettersGrid";
+import Modals from "./utils/Modals";
 
 function AmhApp() {
-  const [letterType, setLetterType] = useState('Amharic Letter 1');
- const [isLoading, setIsLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState('form');
-    const [gridData, setGridData] = useState<PendingLetter[]>([]);
-    const [selectedLetter, setSelectedLetter] = useState<PendingLetter | null>(null);
-    const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [authority, setAuthority] = useState<string | null>(null);
-    const [userId, setUserId] = useState<string | null>(null);
-    const [Uname, setUname] = useState<string | null>(null);
+  const [letterType, setLetterType] = useState("የጨረታ ማስከበሪያ ዋስትና");
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("form");
+  const [gridData, setGridData] = useState<PendingLetter[]>([]);
+  const [selectedLetter, setSelectedLetter] = useState<PendingLetter | null>(null);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [authority, setAuthority] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [Uname, setUname] = useState<string | null>(null);
 
-     useEffect(() => {
-            setAuthority(sessionStorage.getItem('authority'));
-            setUserId(sessionStorage.getItem('userId'));
-            setUname(sessionStorage.getItem('Uname'));
-        }, []);
+  useEffect(() => {
+    setAuthority(sessionStorage.getItem("authority"));
+    setUserId(sessionStorage.getItem("userId"));
+    setUname(sessionStorage.getItem("Uname"));
+  }, []);
 
+  const createInitialData = () => ({
+    refNo: "",
+    date: new Date().toISOString().split("T")[0],
+    toName: "",
+    address: "",
+    clientName: "",
+    bondAmount: 0,
+    currency: "Birr",
+    validityMonth: "",
+    validityDate: "",
+    validityYear: "",
+    fromDate: "",
+    numberOfDays: 0,
+    bidNo: "",
+    bidDate: "",
+    bankName: "AMHARA BANK SC",
+    authorizedSignatory: "",
+    authorizedSignatoryPosition: "",
+    authorizedSignatory1: "",
+    authorizedSignatoryPosition1: "",
+    qrCodeUrl: "",
+  });
 
- const createInitialData = () => ({
-        refNo: '',
-        date: new Date().toISOString().split('T')[0],
-        toName: '',
-        address: '',
-        clientName: '',
-        bondAmount: 0,
-        currency: 'Birr',
-        validityMonth: '',
-        validityDate: '',
-        validityYear: '',
-        fromDate: '',// New property to hold the from date
-        numberOfDays: 0,
-        bidNo: '',
-        bidDate: '',
-        bankName: 'AMHARA BANK SC',
-        authorizedSignatory: '',
-        authorizedSignatoryPosition: '',
-        authorizedSignatory1: '',
-        authorizedSignatoryPosition1: '',
-        qrCodeUrl: '',
-    });
+  const [amharicData, setAmharicData] = useState<AmharicLetterData>(createInitialData());
+  const [amharic2Data, setAmharic2Data] = useState<AmharicLetter2Data>(createInitialData());
+  const [amharic3Data, setAmharic3Data] = useState<AmharicLetter3Data>(createInitialData());
+  const [amharic4Data, setAmharic4Data] = useState<AmharicLetter4Data>(createInitialData());
 
-const [amharicData, setAmharicData] = useState<AmharicLetterData>(createInitialData());
-const [amharic2Data, setAmharic2Data] = useState<AmharicLetter2Data>(createInitialData());
-const [amharic3Data, setAmharic3Data] = useState<AmharicLetter3Data>(createInitialData());
-const [amharic4Data, setAmharic4Data] = useState<AmharicLetter4Data>(createInitialData());
-  
   const getCurrentData = () => {
     switch (letterType) {
-      case 'የጨረታ ማስከበሪያ ዋስትና ':
+      case "የጨረታ ማስከበሪያ ዋስትና":
         return amharicData;
-      case 'የቅድሚያ ክፍያ ዋስትና ':
+      case "የቅድሚያ ክፍያ ዋስትና":
         return amharic2Data;
-      case 'የዕቃ አቅርቦት ዋስትና ':
+      case "የዕቃ አቅርቦት ዋስትና":
         return amharic3Data;
-      case 'የመልካም ስራ አፈፃፀም ዋስትና ':
+      case "የመልካም ስራ አፈፃፀም ዋስትና":
         return amharic4Data;
       default:
         return amharicData;
@@ -132,403 +81,184 @@ const [amharic4Data, setAmharic4Data] = useState<AmharicLetter4Data>(createIniti
 
   const renderForm = () => {
     switch (letterType) {
-      case 'የጨረታ ማስከበሪያ ዋስትና':
+      case "የጨረታ ማስከበሪያ ዋስትና":
         return <AmharicLetterForm data={amharicData} onUpdate={setAmharicData} />;
-      case 'የቅድሚያ ክፍያ ዋስትና':
+      case "የቅድሚያ ክፍያ ዋስትና":
         return <AmharicLetter2Form data={amharic2Data} onUpdate={setAmharic2Data} />;
-      case 'የዕቃ አቅርቦት ዋስትና':
+      case "የዕቃ አቅርቦት ዋስትና":
         return <AmharicLetter3Form data={amharic3Data} onUpdate={setAmharic3Data} />;
-      case 'የመልካም ስራ አፈፃፀም ዋስትና':
+      case "የመልካም ስራ አፈፃፀም ዋስትና":
         return <AmharicLetter4Form data={amharic4Data} onUpdate={setAmharic4Data} />;
       default:
         return <AmharicLetterForm data={amharicData} onUpdate={setAmharicData} />;
     }
   };
 
-    
-
   const renderPreview = () => {
     switch (letterType) {
-      case 'የጨረታ ማስከበሪያ ዋስትና':
+      case "የጨረታ ማስከበሪያ ዋስትና":
         return <AmharicLetterPreview data={amharicData} qrCodeUrl={qrCodeUrl} />;
-      case 'የቅድሚያ ክፍያ ዋስትና':
+      case "የቅድሚያ ክፍያ ዋስትና":
         return <AmharicLetter2Preview data={amharic2Data} qrCodeUrl={qrCodeUrl} />;
-      case 'የዕቃ አቅርቦት ዋስትና':
+      case "የዕቃ አቅርቦት ዋስትና":
         return <AmharicLetter3Preview data={amharic3Data} qrCodeUrl={qrCodeUrl} />;
-      case 'የመልካም ስራ አፈፃፀም ዋስትና':
+      case "የመልካም ስራ አፈፃፀም ዋስትና":
         return <AmharicLetter4Preview data={amharic4Data} qrCodeUrl={qrCodeUrl} />;
       default:
         return <AmharicLetterPreview data={amharicData} qrCodeUrl={qrCodeUrl} />;
     }
   };
 
-
-const handleSaveLetter = async () => {
+  const handleSaveLetter = async () => {
     setIsLoading(true);
     try {
-        const currentData = {
-            letterType: letterType,
-            address: getCurrentData().address || '',
-            toCompanyName: getCurrentData().toName || '',
-            clientName: getCurrentData().clientName || '',
-            guaranteeAmount: getCurrentData().bondAmount || '',
-            bidExpiredDay: getCurrentData().validityDate || '',
-            bidAmount: getCurrentData().bondAmount,
-            bidDate: getCurrentData().bidDate || '',
-            bidNumber: getCurrentData().bidNo || '',
-            fromCompany: 'AMHARA BANK SC',
-            crtBy: Uname || 'unknown',
-            authorizedSignatory1Position: getCurrentData().authorizedSignatoryPosition || '',
-            authorizedSignatory1: getCurrentData().authorizedSignatory || '',
-            authorizedSignatory2Position: getCurrentData().authorizedSignatoryPosition1 || '',
-            authorizedSignatory2: getCurrentData().authorizedSignatory1 || '',
-        };
+      const currentData = {
+        letterType: letterType,
+        address: getCurrentData().address || "",
+        toCompanyName: getCurrentData().toName || "",
+        clientName: getCurrentData().clientName || "",
+        guaranteeAmount: getCurrentData().bondAmount || "",
+        bidExpiredDay: getCurrentData().validityDate || "",
+        bidAmount: getCurrentData().bondAmount,
+        bidDate: getCurrentData().bidDate || "",
+        bidNumber: getCurrentData().bidNo || "",
+        fromCompany: "AMHARA BANK SC",
+        crtBy: Uname || "unknown",
+        authorizedSignatory1Position: getCurrentData().authorizedSignatoryPosition || "",
+        authorizedSignatory1: getCurrentData().authorizedSignatory || "",
+        authorizedSignatory2Position: getCurrentData().authorizedSignatoryPosition1 || "",
+        authorizedSignatory2: getCurrentData().authorizedSignatory1 || "",
+      };
 
-        // API request
-        console.log('Letter to be saved :', currentData);
-        const response = await apiServices.post('submitLetter', currentData);
-        
-        if (response.status !== 200) {
-            alert('Failed to send data to the backend');
-            throw new Error('Failed to send data to the backend');
-        } else {
-            alert('Letter saved successfully');
-            console.log('Letter saved successfully', response.data);
-            
-            // Clear the forms by resetting the state
-            setAmharicData(createInitialData());
-            setAmharic2Data(createInitialData());
-            setAmharic3Data(createInitialData());
-            setAmharic4Data(createInitialData());
-        }
+      const response = await apiServices.post("submitLetter", currentData);
 
-        console.log('Letter to be saved :', currentData);
+      if (response.status !== 200) {
+        alert("Failed to send data to the backend");
+        throw new Error("Failed to send data to the backend");
+      } else {
+        alert("Letter saved successfully");
+        setAmharicData(createInitialData());
+        setAmharic2Data(createInitialData());
+        setAmharic3Data(createInitialData());
+        setAmharic4Data(createInitialData());
+      }
     } catch (error) {
-        console.error('Error saving letter:', error);
+      console.error("Error saving letter:", error);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-};
+  };
 
-const fetchGridData = async () => {
-setIsLoading(true);
-try {
-console.log('Retrieved User ID from session storage:', userId);
-console.log('Retrieved authority from session storage:', authority);
-console.log('Retrieved Uname from session storage:', Uname);  // Log to verify
-const response = await apiServices.post('pendingLetter', {crtBy: Uname,authority: authority});
+  const fetchGridData = async () => {
+    setIsLoading(true);
+    try {
+      const response = await apiServices.post("pendingLetter", {
+        crtBy: Uname,
+        authority: authority,
+      });
 
-
-        if (response.status === 200) {
-            setGridData(response.data); // Assuming response data is an array of PendingLetter
-            console.log('Grid Data:', response.data);
-        }
+      if (response.status === 200) {
+        setGridData(response.data);
+      }
     } catch (error) {
-        console.error('Error fetching pending letters:', error);
+      console.error("Error fetching pending letters:", error);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-};
+  };
 
-// Fetch data when the "grid" tab is active
-useEffect(() => {
-    if (activeTab === 'grid') {
-        fetchGridData();
+  useEffect(() => {
+    if (activeTab === "grid") {
+      fetchGridData();
     }
-}, [activeTab]); // Depend on activeTab
+  }, [activeTab]);
 
-    const handleGenerateLetter = async (item: PendingLetter) => {
-  if (item.status === 2) {
-    setSelectedLetter(item);
-
-    const baseUrl = 'http://10.100.13.44:8433';  // Your app base URL
-
-    // Construct the full URL to the summary page with the refNo param
-    const qrCodeUrl = `${baseUrl}/summary/${encodeURIComponent(item.refNo)}`;
-
-    // Generate a QR code that encodes this URL as a string inside an object
-    const url = await generateQRCode(qrCodeUrl);
-
-    setQrCodeUrl(url);
-    setIsModalOpen(true);
-  } else {
-    alert('QR code can only be generated for letters with status 2.');
-  }
-};
-
- const handlePreviewLetter = async (item: PendingLetter) => {
-  
-        setSelectedLetter(item);
-        setIsModalOpen(true); 
-     
-    };
-
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setSelectedLetter(null);
-        setQrCodeUrl('');
-    };
-
-    const getStatusName = (status: number) => {
-  switch (status) {
-    case 1:
-      return 'Pending';
-    case 2:
-      return 'Authorized';
-    default:
-      return 'Unknown'; // Optional: Handle any other status codes
-  }
-};
-
-const mapPendingLetterToData = (letter: PendingLetter): LetterData => {
-        return {
-            refNo: letter.refNo,
-            date: new Date(letter.dateIssued).toISOString().split('T')[0],
-            toName: letter.toCompanyName,
-            address: letter.address, 
-            clientName: letter.clientName,
-            bondAmount: Number(letter.guaranteeAmount),
-            currency: letter.currency,
-            validityMonth: letter.bidExpiredMonth, 
-            validityDate: letter.bidExpiredDay, 
-            validityYear: letter.bidExpiredYear,
-            fromDate: letter.FormData,
-            numberOfDays: letter.numberOfDays,
-            bidNo: letter.bidNumber, 
-            bidDate: letter.bidDate, 
-            bankName: letter.fromCompany,
-            authorizedSignatory: letter.authorizedSignatory1,
-            authorizedSignatoryPosition: letter.authorizedSignatory1Position,
-            authorizedSignatory1: letter.authorizedSignatory2,
-            authorizedSignatoryPosition1: letter.authorizedSignatory2Position,
-            qrCodeUrl: '', 
-        };
-    };
-
-const handleApproveLetter = async (refNo: string) => {
-
-  try {
-    console.log('refNo', refNo);
-        const response = await apiServices.post('approveLetter', { refNo });
-        console.log('API Response:', response.data);
-        
-        if (response.status === 200) {
-            alert('Letter approved successfully');
-            // Optionally refresh or update the grid data here
-            fetchGridData(); // Refresh grid data after approval
-        } else {
-            alert('Failed to approve the letter');
-        }
-    } catch (error) {
-        console.error('Error approving letter:', error);
-        alert('An error occurred while approving the letter.');
-    }
-   
-} // Implement handleApproveLetter
-
-
-  const renderLetterPreview = () => {
-        if (!selectedLetter) return null;
-
-        const letterData = mapPendingLetterToData(selectedLetter);
-        letterData.qrCodeUrl = qrCodeUrl; // Set QR code URL
-
-        switch (selectedLetter.letterType) {
-            case 'የጨረታ ማስከበሪያ ዋስትና':
-                return <AmharicLetterPreview data={letterData as AmharicLetterData} qrCodeUrl={qrCodeUrl} />;
-            case 'የቅድሚያ ክፍያ ዋስትና':
-                return <AmharicLetter2Preview data={letterData as AmharicLetter2Data} qrCodeUrl={qrCodeUrl} />;
-            case 'የዕቃ አቅርቦት ዋስትና':
-                return <AmharicLetter3Preview data={letterData as AmharicLetter3Data} qrCodeUrl={qrCodeUrl} />;
-            case 'የመልካም ስራ አፈፃፀም ዋስትና':
-                return <AmharicLetter4Preview data={letterData as AmharicLetter4Data} qrCodeUrl={qrCodeUrl} />;
-            default:
-                return null;
-        }
-    };
-
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedLetter(null);
+    setQrCodeUrl("");
+  };
 
   return (
-     <div className="min-h-screen bg-gray-50">
-            <Navbar />
-           <div className="border-b border-gray-200 mb-6">
-  <nav className="flex gap-6" aria-label="Tabs">
-    <button
-      onClick={() => setActiveTab('form')}
-      className={`flex items-center space-x-2 py-4 border-b-2 font-medium text-sm
-        ${activeTab === 'form'
-          ? 'border-blue-600 text-blue-600'
-          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-    >
-      {/* <span className="material-icons text-base">edit</span> */}
-      <span>Form & Preview</span>
-    </button>
-
-    <button
-      onClick={() => setActiveTab('grid')}
-      className={`flex items-center space-x-2 py-4 border-b-2 font-medium text-sm
-        ${activeTab === 'grid'
-          ? 'border-blue-600 text-blue-600'
-          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-    >
-      {/* <span className="material-icons text-base">folder</span> */}
-      <span>Saved Letters</span>
-    </button>
-  </nav>
-{authority === '2' && activeTab === 'form' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div className="space-y-6">
-                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                <h2 className="text-xl font-semibold text-gray-900 flex items-center space-x-2 mb-4">
-                                    <Briefcase className="h-5 w-5" />
-                                    <span>Select Letter Type</span>
-                                </h2>
-                                <select
-                                    value={letterType}
-                                    onChange={(e) => setLetterType(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                >
-                <option value="Amharic Letter 1">የጨረታ ማስከበሪያ ዋስትና  </option>
-                <option value="Amharic Letter 2">የቅድሚያ ክፍያ ዋስትና </option>
-                <option value="Amharic Letter 3">የዕቃ አቅርቦት ዋስትና </option>
-                <option value="Amharic Letter 4">የመልካም ስራ አፈፃፀም ዋስትና </option>
-             </select>
-                            </div>
-                            {renderForm()}
-                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                <button
-                                    onClick={handleSaveLetter}
-                                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 font-medium"
-                                >
-                                    <span>Save</span>
-                                </button>
-                                {isLoading && <p className="text-sm text-gray-500">Saving...</p>}
-                            </div>
-                        </div>
-
-                        <div className="space-y-6">
-                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                <h2 className="text-xl font-semibold text-gray-900">Letter Preview</h2>
-                                {renderPreview()}
-                            </div>
-                        </div>
-                    </div>
-                )}
-             
-{activeTab === 'grid' && (
-                 <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-  <h2 className="text-xl font-semibold text-gray-900 mb-4">Saved Letters</h2>
-  <div className="overflow-x-auto">
-    <table className="min-w-full divide-y divide-gray-200">
-      <thead className="bg-gray-50">
-        <tr>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Ref No</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Letter Type</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">From Company</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">To Company Name</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Client Name</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Authorized Signatory</th>
-          {/* <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Authorized position</th> */}
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Authorized2 Signatory</th>
-          {/* <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Authorized2 position</th> */}
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Guarantee Amount</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Created By</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Authorized By</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Date Issued</th>
-          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-gray-100">
-        {gridData.map((item) => (
-          <tr
-            key={item._id}
-            className="hover:bg-gray-100 transition-all duration-200"
-          >
-            <td className="px-4 py-3 text-sm text-gray-900">{item.refNo}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.letterType}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.fromCompany}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.toCompanyName}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.clientName}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.authorizedSignatory1}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.authorizedSignatory1Position}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.authorizedSignatory2}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.authorizedSignatory2Position}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.guaranteeAmount}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">{item.crtBy}</td>
-            <td className="px-4 py-3 text-sm text-gray-900">
-                {getStatusName(item.status)} {/* Use the mapping function */}
-              </td>
-            <td className="px-4 py-3 text-sm text-gray-900">
-              {new Date(item.dateIssued).toLocaleDateString()}
-            </td>
-            <td className="px-4 py-3 text-sm">
-              <button
-                onClick={() => handlePreviewLetter(item)}
-                className="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 transition"
-              >
-                 Letter Draft
-              </button>
-            </td>
-            <td className="px-4 py-3 text-sm">
-              {authority === '2' && (
-              <button
-                onClick={() => handleGenerateLetter(item)}
-                className="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 transition"
-              >
-                Generate Letter
-              </button>
-              )}
-            </td>
-             <td className="px-4 py-3 text-sm">
-                {authority === '1' && item.status !== 2 && ( // Check authority and status before rendering button
-                  <button
-                    onClick={() => handleApproveLetter(item.refNo)}
-                    className="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 transition"
-                  >
-                    Approve Letter
-                  </button>
-                )}
-              </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-                )}
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="border-b border-gray-200 mb-4">
+          <nav className="flex space-x-6" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab("form")}
+              className={`inline-flex items-center px-1 py-3 border-b-2 text-sm font-medium transition
+        ${activeTab === "form" ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
+            >
+              <span>Form & Preview</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("grid")}
+              className={`inline-flex items-center px-1 py-3 border-b-2 text-sm font-medium transition
+        ${activeTab === "grid" ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
+            >
+              <span>Saved Letters</span>
+            </button>
+          </nav>
+        </div>
+        
+        {authority === "2" && activeTab === "form" && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl shadow border border-gray-100 p-5">
+                <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                  <Briefcase className="h-5 w-5 text-blue-600" />
+                  <span>Select Letter Type</span>
+                </h2>
+                <select
+                  value={letterType}
+                  onChange={(e) => setLetterType(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                >
+                  <option value="የጨረታ ማስከበሪያ ዋስትና">የጨረታ ማስከበሪያ ዋስትና</option>
+                  <option value="የቅድሚያ ክፍያ ዋስትና">የቅድሚያ ክፍያ ዋስትና</option>
+                  <option value="የዕቃ አቅርቦት ዋስትና">የዕቃ አቅርቦት ዋስትና</option>
+                  <option value="የመልካም ስራ አፈፃፀም ዋስትና">የመልካም ስራ አፈፃፀም ዋስትና</option>
+                </select>
+              </div>
+              {renderForm()}
+              <div className="bg-white rounded-xl shadow border border-gray-100 p-5">
+                <button
+                  onClick={handleSaveLetter}
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 font-medium"
+                >
+                  <span>Save</span>
+                </button>
+                {isLoading && <p className="mt-2 text-sm text-gray-500">Saving...</p>}
+              </div>
             </div>
 
-{isModalOpen && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full p-6">
-      <div className="max-h-[60vh] overflow-y-auto" id="letter-content">
-        {renderLetterPreview()}
+            <div className="space-y-6 lg:sticky lg:top-6">
+              <div className="bg-white rounded-xl shadow border border-gray-100 p-5">
+                <h2 className="text-xl font-semibold text-gray-800">Letter Preview</h2>
+                <div className="mt-3">
+                  <div className="w-full min-w-[720px] max-w-full">
+                    {renderPreview()}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "grid" && (
+          <LettersGrid data={gridData} authority={authority} />
+        )}
       </div>
-      <div className="flex justify-end mt-4">
-        <button
-          onClick={closeModal}
-          className="mr-2 bg-gray-300 text-gray-800 py-2 px-4 rounded"
-        >
-          Close
-        </button>
-        <button
-          onClick={handleExportPDF}
-          className="bg-blue-600 text-white py-2 px-4 rounded"
-        >
-          Export to PDF
-        </button>
-      </div>
+
+      <Modals
+        open={isModalOpen}
+        letter={selectedLetter}
+        onClose={closeModal}
+        qrCodeUrl={qrCodeUrl}
+      />
     </div>
-  </div>
-)}
-
-
-
-        </div>
-    );
+  );
 }
 
-export default withAuth( AmhApp) ;
+export default withAuth(AmhApp);

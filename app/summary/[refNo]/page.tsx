@@ -61,14 +61,15 @@ async function fetchLetterData(refNo: string): Promise<LetterData | null> {
   }
 }
 
-export default async function Page({ params }: { params: { refNo: string } }) {
-  const data = await fetchLetterData(params.refNo);
+export default async function Page({ params }: { params: Promise<{ refNo: string }> }) {
+  const resolvedParams = await params; // Await params
+  const data = await fetchLetterData(resolvedParams.refNo);
 
   if (!data) {
     return (
       <main className="min-h-screen flex items-center justify-center p-10">
         <p className="text-xl text-red-600">
-          No data found for reference number: {params.refNo}
+          No data found for reference number: {resolvedParams.refNo}
         </p>
       </main>
     );

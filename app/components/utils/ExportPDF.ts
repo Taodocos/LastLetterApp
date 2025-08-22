@@ -1,7 +1,8 @@
+import { PendingLetter } from "@/types/letters";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-export const handleExportPDF = async () => {
+export const handleExportPDF = async (letter: PendingLetter) => {
   try {
     const input = document.getElementById("letter-content");
     if (!input) throw new Error("Letter content element not found");

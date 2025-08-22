@@ -44,7 +44,7 @@ export default function SummaryDisplay({ data }: { data: LetterData }) {
     setError(null);
 
     try {
-      console.log('data to be send to backend:', phoneNumber, data.refNo, data.secretCode);
+      console.log('Data to be sent to backend:', phoneNumber, data.refNo, data.secretCode);
       const response = await apiServices.post('verifyLetters', { 
         phone: phoneNumber, 
         refNo: data.refNo, 
@@ -63,19 +63,12 @@ export default function SummaryDisplay({ data }: { data: LetterData }) {
       setIsLoading(false);
     }
   };
-const formatDate = (dateStr?: string | null) => {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return '';
-  return d.toISOString().split('T')[0]; // YYYY-MM-DD
-};
-  // ✅ Use "ETB" for Intl.NumberFormat and append "Birr" manually
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: data.currency, // standard ISO code for Ethiopian Birr
-      minimumFractionDigits: 2
-    }).format(amount) + ' Birr';
+
+  const formatDate = (dateStr?: string | null) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    return d.toISOString().split('T')[0]; // YYYY-MM-DD
   };
 
   return (
@@ -90,16 +83,14 @@ const formatDate = (dateStr?: string | null) => {
         {Object.entries({
           'Letter Type': data.letterType,
           'Reference No': data.refNo,
-          'Date': data.date,
-          'To Name': data.toName,
-          'Address': data.address,
+          'Issued Date': data.date,
+          'Issued on behalf of': data.toName,
           'Client Name': data.clientName,
-          'Bond Amount': formatCurrency(data.bondAmount),
-          'Validity': formatDate(data.date),
-          'Contract Purpose': data.contractPurpose,
+          'Bond Amount': data.bondAmount.toFixed(2), // Display bond amount directly
+          'Currency': data.currency, // Separate currency entry
+          'Valid until': formatDate(data.date),
           'Bid No': data.bidNo,
           'Bid Date': data.bidDate,
-          'Bank Name': data.bankName,
           'Authorized Signatory': data.authorizedSignatory
         }).map(([label, value]) => (
           <div key={label} className="flex justify-between py-2 border-b border-gray-100">
